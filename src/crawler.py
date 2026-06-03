@@ -72,10 +72,23 @@ class PlaywrightCrawler:
     # ── Slow-site thresholds ──
     SLOW_DOMAIN_THRESHOLD_MS = 8000   # Domain is "slow" if avg > 8s
     SLOW_DOMAIN_TIMEOUT_MS = 15000    # Use 15s timeout for slow domains
-    SLOW_DOMAIN_MAX_PAGES = 4         # Max pages to fetch on slow domains
+
+    # ── Resource types to block (we only need HTML text) ──
+    BLOCKED_RESOURCE_TYPES = {
+        "image", "media", "font", "stylesheet",
+    }
+    # ── URL patterns to block (analytics, tracking, ads) ──
+    BLOCKED_URL_PATTERNS = [
+        "google-analytics.com", "googletagmanager.com",
+        "facebook.net", "doubleclick.net", "hotjar.com",
+        "cdn.jsdelivr.net/npm/bootstrap",
+        ".woff2", ".woff", ".ttf", ".eot",
+        ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico",
+        ".mp4", ".mp3", ".avi", ".mov",
+    ]
 
     async def start(self):
-        """Launch browser and create context."""
+        """Launch browser and create context with resource blocking."""
         self._playwright = await async_playwright().start()
         self._browser = await self._playwright.chromium.launch(
             headless=self.headless,
@@ -92,7 +105,23 @@ class PlaywrightCrawler:
             ),
             java_script_enabled=True,
         )
-        logger.info("Browser started (headless=%s)", self.headless)
+
+        # Block heavy resources at network level — we only need HTML text
+        async def _block_resources(route):
+            if route.request.resource_type in self.BLOCKED_RESOURCE_TYPES:
+                await route.abort()
+                return
+            url = route.request.url.lower()
+            if any(pattern in url for pattern in self.BLOCKED_URL_PATTERNS):
+                await route.abort()
+                return
+            await route.continue_()
+
+        await self._context.route("**/*", _block_resources)
+        logger.info(
+            "Browser started (headless=%s, blocking: images/fonts/media/analytics)",
+            self.headless
+        )
 
     async def stop(self):
         """Close browser and cleanup."""
@@ -317,53 +346,42 @@ class PlaywrightCrawler:
         self, urls: list[str], max_concurrent: int = 3, depth: int = 0
     ) -> list[CrawledPage]:
         """
-        Fetch multiple pages with bounded concurrency and adaptive behavior.
-        
-        On slow domains:
-        - Reduces timeout for subsequent pages
-        - Drops low-priority pages beyond SLOW_DOMAIN_MAX_PAGES
+        Fetch ALL pages with bounded concurrency.
+        Every page is important — no pages are skipped.
         
         Args:
-            urls: List of URLs ordered by priority (highest first)
+            urls: List of URLs to fetch
             max_concurrent: Max simultaneous tabs
             depth: Crawl depth for these pages
             
         Returns:
             List of successfully fetched CrawledPage objects
         """
+        semaphore = asyncio.Semaphore(max_concurrent)
         results = []
 
-        # Fetch pages sequentially so we can adapt based on speed
-        for i, url in enumerate(urls):
-            domain = self._get_domain(url)
+        async def _fetch_with_semaphore(url: str):
+            async with semaphore:
+                await asyncio.sleep(0.5)  # Brief polite delay
+                return await self.fetch_page(url, depth=depth)
 
-            # Check if we should skip low-priority pages on slow domains
-            if i >= self.SLOW_DOMAIN_MAX_PAGES and self._is_slow_domain(domain):
+        tasks = [_fetch_with_semaphore(u) for u in urls]
+        raw_results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        for i, (url, result) in enumerate(zip(urls, raw_results)):
+            if isinstance(result, Exception):
+                logger.error("Exception fetching %s: %s", url, result)
+            elif result is not None:
+                results.append(result)
+                domain = self._get_domain(url)
                 avg = self._get_domain_avg_ms(domain)
-                logger.warning(
-                    "Slow domain '%s' (avg %.0fms) — skipping low-priority page %d/%d: %s",
-                    domain, avg, i + 1, len(urls), url
+                logger.info(
+                    "Page %d/%d fetched in %dms (domain avg: %.0fms%s)",
+                    i + 1, len(urls), result.fetch_time_ms, avg,
+                    " [SLOW]" if self._is_slow_domain(domain) else ""
                 )
-                continue
-
-            # Polite delay between requests
-            if i > 0:
-                await asyncio.sleep(1)
-
-            try:
-                result = await self.fetch_page(url, depth=depth)
-                if result is not None:
-                    results.append(result)
-                    avg = self._get_domain_avg_ms(domain)
-                    logger.info(
-                        "Page %d/%d fetched in %dms (domain avg: %.0fms%s)",
-                        i + 1, len(urls), result.fetch_time_ms, avg,
-                        " [SLOW]" if self._is_slow_domain(domain) else ""
-                    )
-                else:
-                    logger.warning("No result for page %d/%d: %s", i + 1, len(urls), url)
-            except Exception as e:
-                logger.error("Exception fetching %s: %s", url, e)
+            else:
+                logger.warning("No result for page %d/%d: %s", i + 1, len(urls), url)
 
         logger.info("Fetched %d/%d pages successfully", len(results), len(urls))
         return results
