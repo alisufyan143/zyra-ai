@@ -186,19 +186,27 @@ class DiscoveryEngine:
             f"{self.base_url}/sitemap_index.xml",
         ]
 
-        # Also check robots.txt for Sitemap directives
-        robots_sitemaps = await self._get_sitemaps_from_robots()
-        sitemap_urls_to_try.extend(robots_sitemaps)
-
-        # Deduplicate
-        sitemap_urls_to_try = list(dict.fromkeys(sitemap_urls_to_try))
-
         all_page_urls = set()
 
         async with aiohttp.ClientSession(
             timeout=aiohttp.ClientTimeout(total=15),
             headers={"User-Agent": "Mozilla/5.0 (compatible; UniversityETL/1.0)"}
         ) as session:
+            # Check robots.txt for Sitemap directives (reuse same session)
+            try:
+                async with session.get(f"{self.base_url}/robots.txt") as resp:
+                    if resp.status == 200:
+                        text = await resp.text()
+                        for line in text.splitlines():
+                            if line.lower().startswith("sitemap:"):
+                                sitemap_url = line.split(":", 1)[1].strip()
+                                sitemap_urls_to_try.append(sitemap_url)
+            except Exception as e:
+                logger.debug("robots.txt fetch failed: %s", e)
+
+            # Deduplicate
+            sitemap_urls_to_try = list(dict.fromkeys(sitemap_urls_to_try))
+
             for sitemap_url in sitemap_urls_to_try:
                 try:
                     urls = await self._fetch_sitemap(session, sitemap_url)
@@ -213,24 +221,6 @@ class DiscoveryEngine:
                 candidates.append(link)
 
         return candidates
-
-    async def _get_sitemaps_from_robots(self) -> list[str]:
-        """Extract Sitemap URLs from robots.txt."""
-        sitemaps = []
-        try:
-            async with aiohttp.ClientSession(
-                timeout=aiohttp.ClientTimeout(total=10)
-            ) as session:
-                async with session.get(f"{self.base_url}/robots.txt") as resp:
-                    if resp.status == 200:
-                        text = await resp.text()
-                        for line in text.splitlines():
-                            if line.lower().startswith("sitemap:"):
-                                sitemap_url = line.split(":", 1)[1].strip()
-                                sitemaps.append(sitemap_url)
-        except Exception as e:
-            logger.debug("robots.txt fetch failed: %s", e)
-        return sitemaps
 
     async def _fetch_sitemap(
         self, session: aiohttp.ClientSession, sitemap_url: str

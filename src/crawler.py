@@ -65,6 +65,8 @@ class PlaywrightCrawler:
         self._browser: Optional[Browser] = None
         self._context: Optional[BrowserContext] = None
         self._stealth_domains: set[str] = set()  # Domains that need stealth
+        self._page_cache: dict[str, Optional[CrawledPage]] = {}  # URL -> result cache
+        self._failed_urls: set[str] = set()  # URLs that already failed — skip rerequests
 
     async def start(self):
         """Launch browser and create context."""
@@ -118,6 +120,15 @@ class PlaywrightCrawler:
         3. If no -> standard fetch first, stealth fallback on bot detection
         4. If stealth triggered -> remember domain for all future requests
         """
+        # ── Cache hit: already fetched this URL ──
+        if url in self._page_cache:
+            logger.debug("Cache hit for %s", url)
+            return self._page_cache[url]
+
+        if url in self._failed_urls:
+            logger.debug("Skipping known-failed URL: %s", url)
+            return None
+
         domain = self._get_domain(url)
 
         # Domain already known to need stealth — skip standard attempt
@@ -126,6 +137,9 @@ class PlaywrightCrawler:
             result = await self._try_fetch(url, depth, use_stealth=True)
             if result is None:
                 logger.error("Stealth fetch failed for %s", url)
+                self._failed_urls.add(url)
+            else:
+                self._page_cache[url] = result
             return result
 
         # Attempt 1: Standard fetch
@@ -146,6 +160,9 @@ class PlaywrightCrawler:
 
         if result is None:
             logger.error("All fetch attempts failed for %s", url)
+            self._failed_urls.add(url)
+        else:
+            self._page_cache[url] = result
 
         return result
 
@@ -177,8 +194,13 @@ class PlaywrightCrawler:
 
             status_code = response.status
 
-            # Wait a bit for dynamic content to render
-            await page.wait_for_timeout(2000)
+            # Smart wait: use networkidle instead of fixed 2s delay
+            # Most pages settle in <500ms; only JS-heavy ones need longer
+            try:
+                await page.wait_for_load_state("networkidle", timeout=5000)
+            except Exception:
+                # Timeout is fine — page still has useful content
+                await page.wait_for_timeout(500)
 
             # Get page content
             html = await page.content()
@@ -217,7 +239,7 @@ class PlaywrightCrawler:
                 )
                 return crawled
             except Exception as e:
-                logger.warning("Page validation failed for %s: %s", url, e)
+                logger.warning("Page validation failed for %s: %s", url, str(e)[:200])
                 return None
 
         except Exception as e:

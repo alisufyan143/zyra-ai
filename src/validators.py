@@ -198,6 +198,7 @@ class CrawledPage(BaseModel):
     def must_be_success(cls, v: int) -> int:
         if v >= 400:
             raise ValueError(f"HTTP error status: {v}")
+        # Accept 2xx and 3xx (Playwright follows redirects to final page)
         return v
 
     @field_validator("html")

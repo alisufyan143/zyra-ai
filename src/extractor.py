@@ -6,6 +6,7 @@ Includes per-field confidence scoring and source URL attribution.
 
 import logging
 import re
+from functools import lru_cache
 from typing import Optional
 
 from bs4 import BeautifulSoup
@@ -91,6 +92,7 @@ class DeadlineListWithConfidence(BaseModel):
     overall_confidence: ConfidenceLevel = ConfidenceLevel.MEDIUM
 
 
+@lru_cache(maxsize=32)
 def html_to_markdown(html: str) -> str:
     """
     Convert HTML to clean markdown for LLM consumption.
