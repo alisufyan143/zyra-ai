@@ -2,6 +2,10 @@
 Playwright-based web page crawler with stealth fallback.
 Fetches pages using a real browser, handles JS rendering, 
 redirects, and bot detection.
+
+Stealth is "sticky" per domain: once bot detection triggers stealth
+for any page on a domain, ALL subsequent requests to that domain
+automatically use stealth from the start.
 """
 
 import asyncio
@@ -9,6 +13,7 @@ import time
 import re
 import logging
 from typing import Optional
+from urllib.parse import urlparse
 
 from playwright.async_api import async_playwright, Browser, BrowserContext, Page
 from playwright_stealth import Stealth
@@ -59,6 +64,7 @@ class PlaywrightCrawler:
         self._playwright = None
         self._browser: Optional[Browser] = None
         self._context: Optional[BrowserContext] = None
+        self._stealth_domains: set[str] = set()  # Domains that need stealth
 
     async def start(self):
         """Launch browser and create context."""
@@ -97,15 +103,31 @@ class PlaywrightCrawler:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.stop()
 
+    @staticmethod
+    def _get_domain(url: str) -> str:
+        """Extract domain from URL for stealth tracking."""
+        return urlparse(url).netloc.lower()
+
     async def fetch_page(self, url: str, depth: int = 0) -> Optional[CrawledPage]:
         """
         Fetch a single page. Returns CrawledPage or None on failure.
         
         Flow:
-        1. Standard fetch
-        2. If bot-detected -> retry with stealth
-        3. Validate with CrawledPage model
+        1. Check if domain is already marked for stealth
+        2. If yes -> stealth directly (no wasted standard attempt)
+        3. If no -> standard fetch first, stealth fallback on bot detection
+        4. If stealth triggered -> remember domain for all future requests
         """
+        domain = self._get_domain(url)
+
+        # Domain already known to need stealth — skip standard attempt
+        if domain in self._stealth_domains:
+            logger.info("Domain '%s' requires stealth — using directly", domain)
+            result = await self._try_fetch(url, depth, use_stealth=True)
+            if result is None:
+                logger.error("Stealth fetch failed for %s", url)
+            return result
+
         # Attempt 1: Standard fetch
         result = await self._try_fetch(url, depth, use_stealth=False)
 
@@ -113,6 +135,14 @@ class PlaywrightCrawler:
             logger.warning("Standard fetch failed for %s, trying stealth...", url)
             # Attempt 2: Stealth fetch
             result = await self._try_fetch(url, depth, use_stealth=True)
+
+            if result is not None:
+                # Stealth worked — mark this domain for all future requests
+                self._stealth_domains.add(domain)
+                logger.info(
+                    "Domain '%s' added to stealth list — all future requests will use stealth",
+                    domain
+                )
 
         if result is None:
             logger.error("All fetch attempts failed for %s", url)
