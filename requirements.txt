@@ -1,0 +1,9 @@
+playwright>=1.49
+playwright-stealth>=1.0.6
+aiohttp>=3.10
+beautifulsoup4>=4.12
+lxml>=5.0
+markdownify>=0.13
+instructor[google-genai]>=1.7
+pydantic[email]>=2.7
+python-dotenv>=1.0

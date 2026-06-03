@@ -1,0 +1,172 @@
+{
+  "overview": {
+    "university_name": "Bucknell University",
+    "location": {
+      "city": null,
+      "state": null,
+      "country": "United States",
+      "postal_code": null
+    },
+    "contact": {
+      "phone": null,
+      "email": null
+    }
+  },
+  "tuition_breakdown": [
+    {
+      "fee_type": "Tuition",
+      "cost": 72600,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Housing (On Campus)",
+      "cost": 11400,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Housing (Off Campus Estimate)",
+      "cost": 11400,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Housing (Living with Family Estimate)",
+      "cost": 2000,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Meal Plan (On Campus)",
+      "cost": 6980,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Food (Off Campus Estimate)",
+      "cost": 6980,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Food (Living with Family Estimate)",
+      "cost": 2000,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Student Activity Fee",
+      "cost": 900,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Books, Course Materials, Supplies and Equipment Estimate",
+      "cost": 900,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Transportation Estimate",
+      "cost": 800,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Personal Expenses Estimate",
+      "cost": 2000,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Orientation Fee (One-Time)",
+      "cost": 500,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "International Orientation Fee (One-Time)",
+      "cost": 750,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Audit Fee (per course)",
+      "cost": 300,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Credit by Examination Fee (per course)",
+      "cost": 500,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Private Music Lessons (per semester)",
+      "cost": 625,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Single-Course Rate (part-time students)",
+      "cost": 6600,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Course Overload Fee (per credit)",
+      "cost": 6600,
+      "currency": "USD"
+    }
+  ],
+  "admission_deadlines": [
+    {
+      "deadline_type": "Early Decision",
+      "deadline_date": "2025-11-01",
+      "notes": "Application, scholarship application, CSS Profile and FAFSA due. Binding. New deadline for 2025-26 application cycle."
+    },
+    {
+      "deadline_type": "Early Decision",
+      "deadline_date": "2026-01-10",
+      "notes": "Application, scholarship application, CSS Profile and FAFSA due. Binding. New deadline for 2025-26 application cycle."
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-01-10",
+      "notes": "Application, scholarship application, CSS Profile and FAFSA due. New deadline for 2025-26 application cycle."
+    },
+    {
+      "deadline_type": "Transfer Admission",
+      "deadline_date": "2026-03-15",
+      "notes": "For Fall semester enrollment. Application available Mid-August. Decisions available Mid-May."
+    },
+    {
+      "deadline_type": "Transfer Admission",
+      "deadline_date": "2025-11-01",
+      "notes": "For Spring semester enrollment. Application available Mid-August. Decisions available Mid-Dec."
+    }
+  ],
+  "page_metadata": [
+    {
+      "url": "https://www.bucknell.edu/",
+      "page_title": "Bucknell University | Liberal Arts, Engineering, & Management Colleges",
+      "scraped_at": "2026-06-03T05:17:20.864288+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.bucknell.edu/admissions-aid/admissions-dates-deadlines/",
+      "page_title": "Admissions Dates & Deadlines",
+      "scraped_at": "2026-06-03T05:17:20.864288+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.bucknell.edu/admissions-aid/tuition-fees-financial-aid/",
+      "page_title": "Tuition, Fees & Financial Aid",
+      "scraped_at": "2026-06-03T05:17:20.864288+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.bucknell.edu/admissions-aid/",
+      "page_title": "Admissions & Financial Aid Information — Bucknell University",
+      "scraped_at": "2026-06-03T05:17:20.864288+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.bucknell.edu/admissions-aid/tuition-fees-financial-aid/scholarship-programs/",
+      "page_title": "Scholarship Programs",
+      "scraped_at": "2026-06-03T05:17:20.864288+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.bucknell.edu/admissions-aid/apply-bucknell/",
+      "page_title": "Apply to Bucknell",
+      "scraped_at": "2026-06-03T05:17:20.864288+00:00",
+      "status_code": "200"
+    }
+  ]
+}

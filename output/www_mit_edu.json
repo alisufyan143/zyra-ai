@@ -1,0 +1,336 @@
+{
+  "overview": {
+    "university_name": "Massachusetts Institute of Technology",
+    "location": {
+      "city": null,
+      "state": "MA",
+      "country": "United States",
+      "postal_code": null
+    },
+    "contact": {
+      "phone": null,
+      "email": null
+    }
+  },
+  "tuition_breakdown": [],
+  "admission_deadlines": [
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Aeronautics and Astronautics application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-01-07",
+      "notes": "Architecture application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Biological Engineering application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Biology application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Brain and Cognitive Sciences application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-01-07",
+      "notes": "Center for Real Estate application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Chemical Engineering application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Chemistry application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Civil and Environmental Engineering application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Computational and Systems Biology application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Computational Science and Engineering PhD application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-01-15",
+      "notes": "Data, Economics, and Design of Policy application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Earth, Atmospheric, and Planetary Sciences application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Economics application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Electrical Engineering and Computer Science application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Health Sciences and Technology (Joint Harvard-MIT Program) application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "History, Anthropology, and Science, Technology, and Society application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Institute for Data, Systems, and Society application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-11-08",
+      "notes": "Leaders for Global Operations application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Linguistics application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Materials Science and Engineering application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Mathematics application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Mechanical Engineering application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Media Arts and Sciences application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Microbiology application deadline"
+    },
+    {
+      "deadline_type": null,
+      "deadline_date": null,
+      "notes": "Multiple Rounds of Deadlines for MIT Sloan Executive MBA Program, specific dates not provided"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-10-20",
+      "notes": "Round 1 deadline for MIT Sloan Fellows MBA Program"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-01-26",
+      "notes": "Round 2 deadline for MIT Sloan Fellows MBA Program"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-01-03",
+      "notes": "MIT Sloan Master of Business Analytics application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-01-05",
+      "notes": "MIT Sloan Master of Finance application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-02-20",
+      "notes": "MIT Sloan Master of Science in Management Studies application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-09-29",
+      "notes": "Round 1 deadline for MIT Sloan MBA Program"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-01-13",
+      "notes": "Round 2 deadline for MIT Sloan MBA Program"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-04-06",
+      "notes": "Round 3 deadline for MIT Sloan MBA Program"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "MIT Sloan PhD Program application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-10-01",
+      "notes": "Priority deadline for MIT-WHOI Joint Program in Oceanography / Applied Ocean Science and Engineering"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "Final deadline for MIT-WHOI Joint Program in Oceanography / Applied Ocean Science and Engineering"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-22",
+      "notes": "Music Technology and Computation application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Nuclear Science and Engineering application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Operations Research Center application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-01-02",
+      "notes": "Philosophy application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Physics application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Political Science application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-01",
+      "notes": "First deadline for Program in Polymers and Soft Matter"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Second deadline for Program in Polymers and Soft Matter"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-01-15",
+      "notes": "Science Writing application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-01-09",
+      "notes": "Round 1 deadline for Supply Chain Management Blended"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-06-19",
+      "notes": "Round 2 deadline for Supply Chain Management Blended"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-11-01",
+      "notes": "Round 1 deadline for Supply Chain Management Residential"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-01-31",
+      "notes": "Round 2 deadline for Supply Chain Management Residential"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-03-31",
+      "notes": "Round 3 deadline for Supply Chain Management Residential"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-13",
+      "notes": "Round 1 deadline for System Design and Management"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2026-02-28",
+      "notes": "Round 2 deadline for System Design and Management"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Technology and Policy Program application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Transportation application deadline"
+    },
+    {
+      "deadline_type": "Regular Decision",
+      "deadline_date": "2025-12-15",
+      "notes": "Urban Studies and Planning application deadline"
+    }
+  ],
+  "page_metadata": [
+    {
+      "url": "https://www.mit.edu/",
+      "page_title": "MIT - Massachusetts Institute of Technology",
+      "scraped_at": "2026-06-03T05:19:18.349579+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.mit.edu/admissions-aid/",
+      "page_title": "Admissions + Aid | MIT - Massachusetts Institute of Technology",
+      "scraped_at": "2026-06-03T05:19:18.349579+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://sfs.mit.edu/undergraduate-financial-aid/",
+      "page_title": "Undergraduate students | MIT Student Financial Services",
+      "scraped_at": "2026-06-03T05:19:18.349579+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://oge.mit.edu/graduate-admissions/",
+      "page_title": "Graduate Admissions | Office of Graduate Education",
+      "scraped_at": "2026-06-03T05:19:18.349579+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://sfs.mit.edu/graduate-students/",
+      "page_title": "Graduate students | MIT Student Financial Services",
+      "scraped_at": "2026-06-03T05:19:18.349579+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://oge.mit.edu/graduate-admissions/programs/",
+      "page_title": "Degree programs | Office of Graduate Education",
+      "scraped_at": "2026-06-03T05:19:18.349579+00:00",
+      "status_code": "200"
+    }
+  ]
+}

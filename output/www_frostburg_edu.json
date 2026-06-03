@@ -1,0 +1,189 @@
+{
+  "overview": null,
+  "tuition_breakdown": [
+    {
+      "fee_type": "In-State Annual Total Undergraduate/Certificate",
+      "cost": 26020,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "In-State Annual Undergraduate/Certificate Tuition",
+      "cost": 7640,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "In-State Annual Undergraduate/Certificate Fees",
+      "cost": 3138,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "In-State Annual Undergraduate/Certificate Housing and Meals",
+      "cost": 15242,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Regional Annual Total Undergraduate/Certificate",
+      "cost": 35578,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Regional Annual Undergraduate/Certificate Tuition",
+      "cost": 17198,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Regional Annual Undergraduate/Certificate Fees",
+      "cost": 3138,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Regional Annual Undergraduate/Certificate Housing and Meals",
+      "cost": 15242,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Out-of-State Annual Total Undergraduate/Certificate",
+      "cost": 41686,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Out-of-State Annual Undergraduate/Certificate Tuition",
+      "cost": 23306,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Out-of-State Annual Undergraduate/Certificate Fees",
+      "cost": 3138,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Out-of-State Annual Undergraduate/Certificate Housing and Meals",
+      "cost": 15242,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "FSU at Hagerstown Maryland Tuition",
+      "cost": 7640,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "FSU at Hagerstown Regional Tuition",
+      "cost": 17198,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "FSU at Hagerstown Out-of-State Tuition",
+      "cost": 23306,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Undergraduate Part-time Maryland Tuition (per credit hour)",
+      "cost": 320,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Undergraduate Part-time Regional Tuition (per credit hour)",
+      "cost": 484,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Undergraduate Part-time Out-of-State Tuition (per credit hour)",
+      "cost": 654,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Non-degree Students Maryland Tuition (per credit hour)",
+      "cost": 320,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Non-degree Students Regional Tuition (per credit hour)",
+      "cost": 484,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Non-degree Students Out-of-State Tuition (per credit hour)",
+      "cost": 654,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Graduate Program Maryland Residents Tuition (per credit hour)",
+      "cost": 496,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Graduate Program Out-of-State Residents Tuition (per credit hour)",
+      "cost": 630,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Graduate Program Online Tuition (per credit hour)",
+      "cost": 525,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Nurse Practitioner Program Maryland Residents Tuition (per credit hour)",
+      "cost": 580,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Physician Assistant Program Maryland Residents Tuition (per credit hour)",
+      "cost": 662,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Physician Assistant Program Regional Residents Tuition (per credit hour)",
+      "cost": 784,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Physician Assistant Program Out-of-State Residents Tuition (per credit hour)",
+      "cost": 956,
+      "currency": "USD"
+    },
+    {
+      "fee_type": "Doctoral Program Online Tuition (per credit hour)",
+      "cost": 705,
+      "currency": "USD"
+    }
+  ],
+  "admission_deadlines": [],
+  "page_metadata": [
+    {
+      "url": "https://www.frostburg.edu/",
+      "page_title": "Frostburg State University",
+      "scraped_at": "2026-06-03T05:21:54.448857+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.frostburg.edu/admissions-and-cost/financial-aid/qualifying-for-aid/dates-and-deadlines.php/",
+      "page_title": "Dates and Deadlines",
+      "scraped_at": "2026-06-03T05:21:54.448857+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.frostburg.edu/admissions-and-cost/tuition-and-fees/",
+      "page_title": "Tuition & Fees",
+      "scraped_at": "2026-06-03T05:21:54.448857+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.frostburg.edu/admissions-and-cost/index.php/",
+      "page_title": "Admission and Cost",
+      "scraped_at": "2026-06-03T05:21:54.448857+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.frostburg.edu/admissions-and-cost/tuition-and-fees/index.php/",
+      "page_title": "Tuition & Fees",
+      "scraped_at": "2026-06-03T05:21:54.448857+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.frostburg.edu/academics/graduate-programs/index.php/",
+      "page_title": "Graduate Programs | Frostburg State University",
+      "scraped_at": "2026-06-03T05:21:54.448857+00:00",
+      "status_code": "200"
+    }
+  ]
+}

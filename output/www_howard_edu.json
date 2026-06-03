@@ -1,0 +1,61 @@
+{
+  "overview": {
+    "university_name": "Howard University",
+    "location": {
+      "city": "Washington",
+      "state": "DC",
+      "country": "United States",
+      "postal_code": null
+    },
+    "contact": {
+      "phone": null,
+      "email": null
+    }
+  },
+  "tuition_breakdown": [
+    {
+      "fee_type": "Student Parking (annual)",
+      "cost": 680,
+      "currency": "USD"
+    }
+  ],
+  "admission_deadlines": [],
+  "page_metadata": [
+    {
+      "url": "https://www.howard.edu/",
+      "page_title": "Howard University Home | Excellence in Truth and Service",
+      "scraped_at": "2026-06-03T05:20:21.049228+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.howard.edu/registrar/dates-deadlines/",
+      "page_title": "Dates and Deadlines | Howard University",
+      "scraped_at": "2026-06-03T05:20:21.049228+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://financialservices.howard.edu/tuition-fees/cost-attendance/",
+      "page_title": "Cost of Attendance | Howard University | Student Financial Services",
+      "scraped_at": "2026-06-03T05:20:21.049228+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://financialservices.howard.edu/office-bursar/important-deadlines/",
+      "page_title": "Important Deadlines | Howard University | Student Financial Services",
+      "scraped_at": "2026-06-03T05:20:21.049228+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://financialservices.howard.edu/tuition-fees/cost-attendance/parking-costs/",
+      "page_title": "Parking Costs | Howard University | Student Financial Services",
+      "scraped_at": "2026-06-03T05:20:21.049228+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.howard.edu/registrar/transfer-credit-articulation-agreements/",
+      "page_title": "Transfer Credit Articulation Agreements | Howard University",
+      "scraped_at": "2026-06-03T05:20:21.049228+00:00",
+      "status_code": "200"
+    }
+  ]
+}

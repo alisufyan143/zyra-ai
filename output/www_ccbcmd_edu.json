@@ -1,0 +1,106 @@
+{
+  "overview": {
+    "university_name": "Community College of Baltimore County",
+    "location": {
+      "city": "Baltimore",
+      "state": "MD",
+      "country": "United States",
+      "postal_code": null
+    },
+    "contact": {
+      "phone": "+1-443-840-2222",
+      "email": "financialaid@ccbcmd.edu"
+    }
+  },
+  "tuition_breakdown": [],
+  "admission_deadlines": [
+    {
+      "deadline_type": null,
+      "deadline_date": "2026-06-30",
+      "notes": "FAFSA application deadline for the 2025-2026 school year."
+    },
+    {
+      "deadline_type": null,
+      "deadline_date": "2027-06-30",
+      "notes": "FAFSA application deadline for the 2026-2027 school year."
+    },
+    {
+      "deadline_type": null,
+      "deadline_date": "2027-03-01",
+      "notes": "Priority consideration deadline for Maryland State financial aid (FAFSA submission) for the 2027-2028 school year."
+    },
+    {
+      "deadline_type": null,
+      "deadline_date": "2026-07-10",
+      "notes": "Deadline to apply for Fall 2026 foundation scholarships and grants through the CCBC$FundMe application."
+    },
+    {
+      "deadline_type": null,
+      "deadline_date": "2024-06-01",
+      "notes": "Start date for credit classes (rolling admission applies for Summer 2024 term)."
+    },
+    {
+      "deadline_type": null,
+      "deadline_date": "2024-06-15",
+      "notes": "Start date for credit classes (rolling admission applies for Summer 2024 term)."
+    },
+    {
+      "deadline_type": null,
+      "deadline_date": "2024-07-13",
+      "notes": "Start date for credit classes (rolling admission applies for Summer 2024 term)."
+    },
+    {
+      "deadline_type": null,
+      "deadline_date": "2024-08-31",
+      "notes": "Start date for credit classes (rolling admission applies for Fall 2024 term)."
+    },
+    {
+      "deadline_type": null,
+      "deadline_date": "2024-09-28",
+      "notes": "Start date for credit classes (rolling admission applies for Fall 2024 term)."
+    },
+    {
+      "deadline_type": null,
+      "deadline_date": "2024-10-21",
+      "notes": "Start date for credit classes (rolling admission applies for Fall 2024 term)."
+    }
+  ],
+  "page_metadata": [
+    {
+      "url": "https://www.ccbcmd.edu/",
+      "page_title": "Community College of Baltimore County Homepage",
+      "scraped_at": "2026-06-03T05:25:42.772053+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.ccbcmd.edu/Paying-for-College/Financial-Aid/Dates-Deadlines/index.html",
+      "page_title": "Dates and Deadlines",
+      "scraped_at": "2026-06-03T05:25:42.772053+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.ccbcmd.edu/Paying-for-College/Tuition-and-Fees/Cost-of-Attendance/index.html",
+      "page_title": "Cost of Attendance",
+      "scraped_at": "2026-06-03T05:25:42.772053+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.ccbcmd.edu/Admission-and-Registration/Get-Started/index.html/",
+      "page_title": "Get Started",
+      "scraped_at": "2026-06-03T05:25:42.772053+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.ccbcmd.edu/Paying-for-College/Tuition-and-Fees/Payment-Options/index.html",
+      "page_title": "Tuition Payment Options",
+      "scraped_at": "2026-06-03T05:25:42.772053+00:00",
+      "status_code": "200"
+    },
+    {
+      "url": "https://www.ccbcmd.edu/Admission-and-Registration/Request-Information/index.html/",
+      "page_title": "Request Information",
+      "scraped_at": "2026-06-03T05:25:42.772053+00:00",
+      "status_code": "200"
+    }
+  ]
+}
