@@ -2,3 +2,4 @@ temp-scripts
 dotenv
 __pycache__
 .env
+output/
