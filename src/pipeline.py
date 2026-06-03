@@ -1,12 +1,13 @@
 """
 ETL Pipeline Orchestrator.
-Ties together: validation -> discovery -> crawling -> extraction -> normalization -> output.
+Ties together: validation -> discovery -> crawling -> extraction -> normalization -> quality -> output.
 Full step-by-step logging at every stage.
 """
 
 import json
 import logging
 import os
+import time
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -20,6 +21,7 @@ from src.normalizers import (
     normalize_currency, normalize_date, normalize_fee_type,
     normalize_university_name,
 )
+from src.quality import run_quality_checks
 from src.schemas import (
     UniversityData, Overview, Location, Contact,
     TuitionItem, AdmissionDeadline, PageMetadata,
@@ -37,9 +39,9 @@ class ETLPipeline:
     1. Validate & normalize input domain
     2. Discover relevant pages (sitemap + nav + scoring)
     3. Fetch pages with Playwright
-    4. Extract data with Gemini LLM
+    4. Extract data with Gemini LLM (with confidence + source tracking)
     5. Normalize outputs
-    6. Validate with Pydantic & save JSON
+    6. Quality checks + assemble + validate + save JSON
     """
 
     def __init__(self, headless: bool = False):
@@ -48,24 +50,17 @@ class ETLPipeline:
         self._extractor: Optional[GeminiExtractor] = None
 
     async def run(self, raw_domain: str, output_dir: str = "output") -> Optional[UniversityData]:
-        """
-        Run the full ETL pipeline for a single university.
-        
-        Args:
-            raw_domain: Raw URL/domain string from user.
-            output_dir: Directory to save output JSON.
-            
-        Returns:
-            Validated UniversityData or None on total failure.
-        """
+        """Run the full ETL pipeline for a single university."""
         run_start = datetime.now(timezone.utc)
+        step_timings = {}
 
         logger.info("=" * 60)
         logger.info("PIPELINE START: %s", raw_domain)
         logger.info("=" * 60)
 
         # ── STEP 1: Validate & normalize input ──
-        logger.info("[Step 1/6] Validating and normalizing input domain...")
+        t0 = time.monotonic()
+        logger.info("[Step 1/7] Validating and normalizing input domain...")
         try:
             validated_input = DomainInput(raw_url=raw_domain)
             base_url = validated_input.raw_url
@@ -74,9 +69,11 @@ class ETLPipeline:
             logger.error("  Input validation FAILED: %s", e)
             logger.error("PIPELINE ABORTED for %s", raw_domain)
             return None
+        step_timings["1_validation"] = time.monotonic() - t0
 
         # ── STEP 2: Discover pages ──
-        logger.info("[Step 2/6] Discovering relevant pages (sitemap + navigation)...")
+        t0 = time.monotonic()
+        logger.info("[Step 2/7] Discovering relevant pages (sitemap + navigation)...")
         try:
             discovery = DiscoveryEngine(base_url.rstrip("/"))
             candidates = await discovery.discover(crawler=self._crawler)
@@ -98,9 +95,11 @@ class ETLPipeline:
             logger.error("  Discovery FAILED: %s", e)
             logger.error("PIPELINE ABORTED for %s", raw_domain)
             return None
+        step_timings["2_discovery"] = time.monotonic() - t0
 
         # ── STEP 3: Fetch pages with Playwright ──
-        logger.info("[Step 3/6] Fetching pages with Playwright browser...")
+        t0 = time.monotonic()
+        logger.info("[Step 3/7] Fetching pages with Playwright browser...")
         all_pages: list[CrawledPage] = []
         try:
             pages = await self._crawler.fetch_pages_parallel(
@@ -120,9 +119,9 @@ class ETLPipeline:
             logger.error("  Crawling FAILED: %s", e)
             logger.error("PIPELINE ABORTED for %s", raw_domain)
             return None
+        step_timings["3_crawling"] = time.monotonic() - t0
 
         # ── Classify fetched pages ──
-        homepage = pages[0]  # First page is always homepage
         admissions_pages = []
         tuition_pages = []
 
@@ -136,7 +135,6 @@ class ETLPipeline:
             if is_tui:
                 tuition_pages.append(page)
 
-        # Fallback: if no category pages found, use all pages
         if not admissions_pages:
             logger.warning("  No admissions-specific pages, using all fetched pages as fallback")
             admissions_pages = pages
@@ -147,29 +145,45 @@ class ETLPipeline:
         logger.info("  Classified: %d admissions pages, %d tuition pages",
                      len(admissions_pages), len(tuition_pages))
 
-        # ── STEP 4: Extract data with Gemini LLM ──
-        logger.info("[Step 4/6] Extracting data with Gemini LLM (multi-key pool)...")
+        # ── STEP 4: Extract data with Gemini LLM (with confidence) ──
+        t0 = time.monotonic()
+        logger.info("[Step 4/7] Extracting data with Gemini LLM (multi-key pool)...")
+        extraction_sources = []
+        extraction_confidence = []
+
         try:
-            logger.info("  Extracting overview from %d pages (homepage + subpages)...", len(pages))
-            overview = await self._extractor.extract_overview(pages)
+            logger.info("  Extracting overview from %d pages...", len(pages))
+            overview, ov_source, ov_conf = await self._extractor.extract_overview(pages)
+            extraction_sources.append(ov_source)
+            extraction_confidence.append(ov_conf)
+
             if overview:
                 logger.info("    university_name: %s", overview.university_name)
                 logger.info("    city: %s", overview.location.city if overview.location else "N/A")
                 logger.info("    state: %s", overview.location.state if overview.location else "N/A")
                 logger.info("    phone: %s", overview.contact.phone if overview.contact else "N/A")
                 logger.info("    email: %s", overview.contact.email if overview.contact else "N/A")
+                logger.info("    confidence: %s", ov_conf.overall_confidence.value)
             else:
                 logger.warning("    Overview extraction returned None")
 
             logger.info("  Extracting tuition from %d pages...", len(tuition_pages))
-            tuition = await self._extractor.extract_tuition(tuition_pages)
-            logger.info("    Extracted %d tuition items", len(tuition))
+            tuition, tui_source, tui_conf = await self._extractor.extract_tuition(tuition_pages)
+            extraction_sources.append(tui_source)
+            extraction_confidence.append(tui_conf)
+
+            logger.info("    Extracted %d tuition items (confidence: %s)",
+                        len(tuition), tui_conf.overall_confidence.value)
             for t in tuition:
                 logger.info("      %s: $%s %s", t.fee_type, t.cost, t.currency)
 
             logger.info("  Extracting deadlines from %d pages...", len(admissions_pages))
-            deadlines = await self._extractor.extract_deadlines(admissions_pages)
-            logger.info("    Extracted %d deadlines", len(deadlines))
+            deadlines, ddl_source, ddl_conf = await self._extractor.extract_deadlines(admissions_pages)
+            extraction_sources.append(ddl_source)
+            extraction_confidence.append(ddl_conf)
+
+            logger.info("    Extracted %d deadlines (confidence: %s)",
+                        len(deadlines), ddl_conf.overall_confidence.value)
             for d in deadlines:
                 logger.info("      %s: %s (%s)", d.deadline_type, d.deadline_date, d.notes)
 
@@ -178,9 +192,11 @@ class ETLPipeline:
             overview = None
             tuition = []
             deadlines = []
+        step_timings["4_extraction"] = time.monotonic() - t0
 
         # ── STEP 5: Normalize outputs ──
-        logger.info("[Step 5/6] Normalizing extracted data...")
+        t0 = time.monotonic()
+        logger.info("[Step 5/7] Normalizing extracted data...")
         try:
             if overview:
                 overview = Overview(
@@ -221,6 +237,7 @@ class ETLPipeline:
             logger.error("  Normalization FAILED: %s", e)
             normalized_tuition = tuition
             normalized_deadlines = deadlines
+        step_timings["5_normalization"] = time.monotonic() - t0
 
         # ── Build page metadata ──
         scraped_at = datetime.now(timezone.utc).isoformat()
@@ -233,14 +250,32 @@ class ETLPipeline:
                 status_code=str(p.status_code),
             ))
 
-        # ── STEP 6: Assemble & validate final output ──
-        logger.info("[Step 6/6] Assembling and validating final output...")
+        # ── STEP 6: Quality checks ──
+        t0 = time.monotonic()
+        logger.info("[Step 6/7] Running data quality checks...")
+        pre_quality = UniversityData(
+            overview=overview,
+            tuition_breakdown=normalized_tuition,
+            admission_deadlines=normalized_deadlines,
+            page_metadata=page_metadata,
+            extraction_sources=extraction_sources,
+            extraction_confidence=extraction_confidence,
+        )
+        quality_report = run_quality_checks(pre_quality)
+        step_timings["6_quality"] = time.monotonic() - t0
+
+        # ── STEP 7: Assemble & validate final output ──
+        t0 = time.monotonic()
+        logger.info("[Step 7/7] Assembling and validating final output...")
         try:
             result = UniversityData(
                 overview=overview,
                 tuition_breakdown=normalized_tuition,
                 admission_deadlines=normalized_deadlines,
                 page_metadata=page_metadata,
+                extraction_sources=extraction_sources,
+                extraction_confidence=extraction_confidence,
+                quality_report=quality_report,
             )
 
             # Final Pydantic validation roundtrip
@@ -262,14 +297,24 @@ class ETLPipeline:
             run_time = (datetime.now(timezone.utc) - run_start).total_seconds()
             logger.info("-" * 60)
             logger.info("PIPELINE COMPLETE for %s", base_url)
-            logger.info("  University:  %s", validated.overview.university_name if validated.overview else "N/A")
-            logger.info("  Tuition:     %d items", len(validated.tuition_breakdown))
-            logger.info("  Deadlines:   %d items", len(validated.admission_deadlines))
-            logger.info("  Pages used:  %d", len(validated.page_metadata))
-            logger.info("  Output:      %s", output_path)
-            logger.info("  Duration:    %.1fs", run_time)
-            logger.info("=" * 60)
+            logger.info("  University:    %s", validated.overview.university_name if validated.overview else "N/A")
+            logger.info("  Tuition:       %d items", len(validated.tuition_breakdown))
+            logger.info("  Deadlines:     %d items", len(validated.admission_deadlines))
+            logger.info("  Pages used:    %d", len(validated.page_metadata))
+            logger.info("  Completeness:  %.0f%%", quality_report.completeness_score * 100)
+            logger.info("  Quality issues: %d errors, %d warnings",
+                        sum(1 for i in quality_report.issues if i.severity == "error"),
+                        sum(1 for i in quality_report.issues if i.severity == "warning"))
+            logger.info("  Output:        %s", output_path)
+            logger.info("  Duration:      %.1fs", run_time)
 
+            # Per-step timing breakdown
+            logger.info("  Step timings:")
+            for step_name, duration in step_timings.items():
+                logger.info("    %s: %.1fs", step_name, duration)
+            step_timings["7_assembly"] = time.monotonic() - t0
+
+            logger.info("=" * 60)
             return validated
 
         except Exception as e:
@@ -280,18 +325,7 @@ class ETLPipeline:
     async def run_batch(
         self, domains: list[str], output_dir: str = "output", log_file: str = None
     ) -> dict[str, Optional[UniversityData]]:
-        """
-        Run the pipeline for multiple universities.
-        
-        Args:
-            domains: List of raw domain strings.
-            output_dir: Directory for output JSONs.
-            log_file: Path to log file for all runs.
-            
-        Returns:
-            Dict mapping domain -> UniversityData (or None on failure).
-        """
-        # Setup logging
+        """Run the pipeline for multiple universities."""
         from src.utils import setup_logging
         setup_logging(log_file=log_file, level=logging.INFO)
 
@@ -334,8 +368,9 @@ class ETLPipeline:
             name = result.overview.university_name if result and result.overview else "N/A"
             tui = len(result.tuition_breakdown) if result else 0
             ddl = len(result.admission_deadlines) if result else 0
-            logger.info("    [%s] %s -> %s (tuition:%d, deadlines:%d)",
-                         status, domain, name, tui, ddl)
+            score = f"{result.quality_report.completeness_score*100:.0f}%" if result and result.quality_report else "N/A"
+            logger.info("    [%s] %s -> %s (T:%d D:%d Q:%s)",
+                         status, domain, name, tui, ddl, score)
 
         # ── Log LLM pool stats ──
         logger.info("\n" + pool.get_stats())

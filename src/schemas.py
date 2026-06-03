@@ -53,8 +53,65 @@ class PageMetadata(BaseModel):
     status_code: Optional[str] = None
 
 
+# ── Source Attribution ──
+
+class ExtractionSource(BaseModel):
+    """Tracks which pages fed each extraction call and the model used."""
+    extraction_type: str              # "overview", "tuition", "deadlines"
+    source_urls: List[str] = []       # Pages fed to this extraction call
+    model_used: Optional[str] = None  # e.g. "gemini-3.1-flash-lite"
+    slot_info: Optional[str] = None   # e.g. "Slot 0 (Key-1)"
+
+
+# ── Confidence Scoring ──
+
+class ConfidenceLevel(str, Enum):
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+
+
+class FieldConfidence(BaseModel):
+    """Confidence rating for a specific extracted field."""
+    field_name: str
+    confidence: ConfidenceLevel
+    reason: Optional[str] = None
+
+
+class ExtractionConfidence(BaseModel):
+    """Per-extraction-call confidence ratings."""
+    extraction_type: str                    # "overview", "tuition", "deadlines"
+    overall_confidence: ConfidenceLevel = ConfidenceLevel.MEDIUM
+    field_scores: List[FieldConfidence] = []
+
+
+# ── Data Quality Report ──
+
+class QualityIssue(BaseModel):
+    """A single data quality finding."""
+    severity: str       # "error", "warning", "info"
+    category: str       # "missing_field", "duplicate", "date_sanity", "cost_sanity"
+    message: str
+    field: Optional[str] = None
+
+
+class DataQualityReport(BaseModel):
+    """Post-extraction data quality analysis."""
+    total_fields_expected: int = 0
+    total_fields_populated: int = 0
+    completeness_score: float = 0.0        # 0.0 - 1.0
+    issues: List[QualityIssue] = []
+    duplicate_tuition_count: int = 0
+    duplicate_deadline_count: int = 0
+
+
+# ── Main Output ──
+
 class UniversityData(BaseModel):
     overview: Optional[Overview] = None
     tuition_breakdown: List[TuitionItem] = []
     admission_deadlines: List[AdmissionDeadline] = []
     page_metadata: List[PageMetadata] = []
+    extraction_sources: List[ExtractionSource] = []
+    extraction_confidence: List[ExtractionConfidence] = []
+    quality_report: Optional[DataQualityReport] = None
