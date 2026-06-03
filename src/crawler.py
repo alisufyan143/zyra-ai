@@ -66,7 +66,13 @@ class PlaywrightCrawler:
         self._context: Optional[BrowserContext] = None
         self._stealth_domains: set[str] = set()  # Domains that need stealth
         self._page_cache: dict[str, Optional[CrawledPage]] = {}  # URL -> result cache
-        self._failed_urls: set[str] = set()  # URLs that already failed — skip rerequests
+        self._failed_urls: set[str] = set()  # URLs that already failed
+        self._domain_load_times: dict[str, list[float]] = {}  # Domain -> list of load times (ms)
+
+    # ── Slow-site thresholds ──
+    SLOW_DOMAIN_THRESHOLD_MS = 8000   # Domain is "slow" if avg > 8s
+    SLOW_DOMAIN_TIMEOUT_MS = 15000    # Use 15s timeout for slow domains
+    SLOW_DOMAIN_MAX_PAGES = 4         # Max pages to fetch on slow domains
 
     async def start(self):
         """Launch browser and create context."""
@@ -109,6 +115,27 @@ class PlaywrightCrawler:
     def _get_domain(url: str) -> str:
         """Extract domain from URL for stealth tracking."""
         return urlparse(url).netloc.lower()
+
+    def _record_load_time(self, domain: str, time_ms: float):
+        """Track page load time for a domain."""
+        if domain not in self._domain_load_times:
+            self._domain_load_times[domain] = []
+        self._domain_load_times[domain].append(time_ms)
+
+    def _get_domain_avg_ms(self, domain: str) -> float:
+        """Get average load time for a domain."""
+        times = self._domain_load_times.get(domain, [])
+        return sum(times) / len(times) if times else 0.0
+
+    def _is_slow_domain(self, domain: str) -> bool:
+        """Check if a domain is classified as slow."""
+        return self._get_domain_avg_ms(domain) > self.SLOW_DOMAIN_THRESHOLD_MS
+
+    def _get_timeout_for_domain(self, domain: str) -> int:
+        """Get adaptive timeout based on domain speed."""
+        if self._is_slow_domain(domain):
+            return self.SLOW_DOMAIN_TIMEOUT_MS
+        return self.timeout_ms
 
     async def fetch_page(self, url: str, depth: int = 0) -> Optional[CrawledPage]:
         """
@@ -169,9 +196,14 @@ class PlaywrightCrawler:
     async def _try_fetch(
         self, url: str, depth: int, use_stealth: bool
     ) -> Optional[CrawledPage]:
-        """Single fetch attempt with optional stealth."""
+        """Single fetch attempt with optional stealth and adaptive timeout."""
         page: Optional[Page] = None
         start_time = time.perf_counter()
+        domain = self._get_domain(url)
+        timeout = self._get_timeout_for_domain(domain)
+
+        if timeout < self.timeout_ms:
+            logger.info("Using reduced timeout %dms for slow domain '%s'", timeout, domain)
 
         try:
             page = await self._context.new_page()
@@ -181,11 +213,11 @@ class PlaywrightCrawler:
                 await Stealth().apply_stealth_async(page)
                 logger.info("Stealth mode applied for %s", url)
 
-            # Navigate
+            # Navigate with adaptive timeout
             response = await page.goto(
                 url,
                 wait_until="domcontentloaded",
-                timeout=self.timeout_ms,
+                timeout=timeout,
             )
 
             if response is None:
@@ -214,6 +246,10 @@ class PlaywrightCrawler:
                 content_type = "text/html; charset=utf-8"
 
             fetch_time_ms = int((time.perf_counter() - start_time) * 1000)
+            self._record_load_time(domain, fetch_time_ms)
+
+            if fetch_time_ms > self.SLOW_DOMAIN_THRESHOLD_MS:
+                logger.warning("Slow page: %s took %dms", url, fetch_time_ms)
 
             # Check for bot detection
             if self._is_bot_blocked(html, status_code) and not use_stealth:
@@ -281,36 +317,53 @@ class PlaywrightCrawler:
         self, urls: list[str], max_concurrent: int = 3, depth: int = 0
     ) -> list[CrawledPage]:
         """
-        Fetch multiple pages with bounded concurrency.
-        Uses asyncio.Semaphore to limit concurrent browser tabs.
+        Fetch multiple pages with bounded concurrency and adaptive behavior.
+        
+        On slow domains:
+        - Reduces timeout for subsequent pages
+        - Drops low-priority pages beyond SLOW_DOMAIN_MAX_PAGES
         
         Args:
-            urls: List of URLs to fetch
+            urls: List of URLs ordered by priority (highest first)
             max_concurrent: Max simultaneous tabs
             depth: Crawl depth for these pages
             
         Returns:
             List of successfully fetched CrawledPage objects
         """
-        semaphore = asyncio.Semaphore(max_concurrent)
         results = []
 
-        async def _fetch_with_semaphore(url: str):
-            async with semaphore:
-                # Polite delay between requests
+        # Fetch pages sequentially so we can adapt based on speed
+        for i, url in enumerate(urls):
+            domain = self._get_domain(url)
+
+            # Check if we should skip low-priority pages on slow domains
+            if i >= self.SLOW_DOMAIN_MAX_PAGES and self._is_slow_domain(domain):
+                avg = self._get_domain_avg_ms(domain)
+                logger.warning(
+                    "Slow domain '%s' (avg %.0fms) — skipping low-priority page %d/%d: %s",
+                    domain, avg, i + 1, len(urls), url
+                )
+                continue
+
+            # Polite delay between requests
+            if i > 0:
                 await asyncio.sleep(1)
-                return await self.fetch_page(url, depth=depth)
 
-        tasks = [_fetch_with_semaphore(u) for u in urls]
-        raw_results = await asyncio.gather(*tasks, return_exceptions=True)
-
-        for url, result in zip(urls, raw_results):
-            if isinstance(result, Exception):
-                logger.error("Exception fetching %s: %s", url, result)
-            elif result is not None:
-                results.append(result)
-            else:
-                logger.warning("No result for %s", url)
+            try:
+                result = await self.fetch_page(url, depth=depth)
+                if result is not None:
+                    results.append(result)
+                    avg = self._get_domain_avg_ms(domain)
+                    logger.info(
+                        "Page %d/%d fetched in %dms (domain avg: %.0fms%s)",
+                        i + 1, len(urls), result.fetch_time_ms, avg,
+                        " [SLOW]" if self._is_slow_domain(domain) else ""
+                    )
+                else:
+                    logger.warning("No result for page %d/%d: %s", i + 1, len(urls), url)
+            except Exception as e:
+                logger.error("Exception fetching %s: %s", url, e)
 
         logger.info("Fetched %d/%d pages successfully", len(results), len(urls))
         return results
